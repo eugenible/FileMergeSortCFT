@@ -17,15 +17,19 @@ enum DataType {
 }
 
 public class SortingSettings {
-    private static int minArguments = 3;
 
-    private Order order = Order.ASC;
-    private DataType type = DataType.INTEGER;
+    private Order order;
+    private DataType type;
     private File outputFile;
     private List<File> inputFiles = new ArrayList<>();
 
+    public SortingSettings() {
+        order = Order.ASC;
+        type = DataType.INTEGER;
+    }
 
     public static SortingSettings getInstance(String[] args) throws InvalidLineArgumentException, IOException {
+        int minArguments = 3;
         if (args.length < minArguments) throw new InvalidLineArgumentException("Too few parameters");
         int currI = 0;
         SortingSettings settings = new SortingSettings();
