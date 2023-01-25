@@ -60,14 +60,13 @@ public class FileMerger {
 //    }
 
     // Проверка, есть ли пробелы в строке или содержимое строки не соответствует типу данных.
-    private  boolean isValid(String line) {
+    private boolean isValid(String line) {
         if (line.contains(" ")) return false;
-        return settings.getType() != DataType.INTEGER || line.matches("^[+-]?[0-9]+(\\.0*)?$");
+        return settings.getType() != DataType.INTEGER || line.matches("^[+-]?[0-9]+$");
     }
 
 
-    // мб и не надо булин массив, раз могут быт наллы для объектов входных?
-    public void fillInputLines(BufferedReader[] readers, boolean[] readerAtEOF, Object[] inputLines) throws IOException {
+    public void fillInputLines(BufferedReader[] readers, boolean[] readerAtEOF, String[] inputLines) throws IOException {
         for (int i = 0; i < inputLines.length; ++i) {
             if (inputLines[i] != null) continue;
             String line = null;
@@ -86,10 +85,43 @@ public class FileMerger {
         }
     }
 
-    public Object chooseLine(BufferedReader[] readers, boolean[] readerAtEOF, Object[] inputLines) throws IOException {
+    public String chooseLine(BufferedReader[] readers, boolean[] readerAtEOF, String[] inputLines) throws IOException {
         fillInputLines(readers, readerAtEOF, inputLines);  // Заполнили массив для дальнейшего выбора миним. значения
         // Выставить в null наименьший элемент
-        return new Object();
+        String minStrValue = null;
+        int minIntValue = Integer.MAX_VALUE;
+        int minElementIndex = -1;
+
+        DataType type = settings.getType();
+        // Выставить null в соотв. лементе массива
+        for (int i = 0; i < inputLines.length; ++i) {
+            if (inputLines[i] == null) continue;
+
+            // Выставляем минимальное значение, равное первому элементу, который ne null
+            if (minStrValue == null) {
+                minStrValue = inputLines[i];
+                minElementIndex = i;
+                if (type == DataType.INTEGER) minIntValue = Integer.parseInt(minStrValue);
+            }
+
+            // Сравнение чисел или строк соответственно
+            if (type == DataType.INTEGER) {
+                int a = Integer.parseInt(inputLines[i]);
+                if (a < minIntValue) {
+                    minElementIndex = i;
+                    minIntValue = a;
+                }
+            } else {
+                if (inputLines[i].compareTo(minStrValue) < 0) minStrValue = inputLines[i];
+                minElementIndex = i;
+            }
+        }
+
+        // Задать значение текстового минимального значения, если тип сортируемых данных - числа
+        if (type == DataType.INTEGER && minStrValue != null) minStrValue = String.valueOf(minIntValue);
+        if (minElementIndex != -1) inputLines[minElementIndex] = null;
+
+        return minStrValue;
     }
 
 
@@ -99,14 +131,14 @@ public class FileMerger {
         // С пом. этого массива сможем проверять, достиг ли ридер EOF, не используя
         // сравнение "reader.readLine() != null" множество раз
         boolean[] readerAtEOF = new boolean[readers.length];
-        Object[] inputLines = new Object[readers.length];
+        String[] inputLines = new String[readers.length];
 
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(settings.getOutputFile()))) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(settings.getOutputFile(), false))) {
 
             while (true) {
-                Object lineToWrite = chooseLine(readers, readerAtEOF, inputLines);
+                String lineToWrite = chooseLine(readers, readerAtEOF, inputLines);
                 if (lineToWrite == null) break;
-                writer.write((String) lineToWrite);
+                writer.write(lineToWrite);
                 writer.newLine();
             }
 
