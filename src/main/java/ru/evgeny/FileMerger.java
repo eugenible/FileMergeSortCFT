@@ -81,9 +81,16 @@ public class FileMerger {
                                           String[] previousValues) {
         String prevStrValue = previousValues[index];
         String currValue = inputLines[index];
+        if (prevStrValue == null) {
+            previousValues[index] = currValue;
+            return;
+        }
+
         if (!satisfiesOrder(currValue, prevStrValue)) {
             inputLines[index] = null;
             stopReading[index] = true;
+        } else {
+            previousValues[index] = currValue;
         }
     }
 
