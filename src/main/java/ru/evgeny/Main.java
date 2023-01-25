@@ -22,6 +22,9 @@ public class Main {
 
             printInfo(settings);
 
+            FileMerger merger = new FileMerger(settings);
+            merger.mergeFiles();
+
         } catch (InvalidLineArgumentException | IOException e) {
             System.out.println(e.getMessage());
         }

@@ -21,11 +21,12 @@ public class SortingSettings {
     private Order order;
     private DataType type;
     private File outputFile;
-    private List<File> inputFiles = new ArrayList<>();
+    private List<File> inputFiles;
 
     public SortingSettings() {
         order = Order.ASC;
         type = DataType.INTEGER;
+        inputFiles = new ArrayList<>();
     }
 
     public static SortingSettings getInstance(String[] args) throws InvalidLineArgumentException, IOException {
