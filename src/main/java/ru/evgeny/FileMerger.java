@@ -59,6 +59,12 @@ public class FileMerger {
 //        }
 //    }
 
+    // Проверка, есть ли пробелы в строке или содержимое строки не соответствует типу данных.
+    private  boolean isValid(String line) {
+        if (line.contains(" ")) return false;
+        return settings.getType() != DataType.INTEGER || line.matches("^[+-]?[0-9]+(\\.0*)?$");
+    }
+
 
     // мб и не надо булин массив, раз могут быт наллы для объектов входных?
     public void fillInputLines(BufferedReader[] readers, boolean[] readerAtEOF, Object[] inputLines) throws IOException {
@@ -72,8 +78,10 @@ public class FileMerger {
                     continue;
                 }
 
-                inputLines[i] = line;
-
+                if (isValid(line)) {
+                    inputLines[i] = line;
+                    isValidLine = true;
+                }
             }
         }
     }
@@ -81,7 +89,7 @@ public class FileMerger {
     public Object chooseLine(BufferedReader[] readers, boolean[] readerAtEOF, Object[] inputLines) throws IOException {
         fillInputLines(readers, readerAtEOF, inputLines);  // Заполнили массив для дальнейшего выбора миним. значения
         // Выставить в null наименьший элемент
-
+        return new Object();
     }
 
 
@@ -98,6 +106,8 @@ public class FileMerger {
             while (true) {
                 Object lineToWrite = chooseLine(readers, readerAtEOF, inputLines);
                 if (lineToWrite == null) break;
+                writer.write((String) lineToWrite);
+                writer.newLine();
             }
 
         } catch (IOException e) {
