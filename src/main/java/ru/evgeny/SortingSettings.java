@@ -18,10 +18,9 @@ enum DataType {
 
 public class SortingSettings {
     private static int minArguments = 3;
-    private static InputValidator validator = new InputValidator();
 
     private Order order = Order.ASC;
-    private DataType type;
+    private DataType type = DataType.INTEGER;
     private File outputFile;
     private List<File> inputFiles = new ArrayList<>();
 
@@ -38,13 +37,15 @@ public class SortingSettings {
 
         if (!args[currI].equals("-s") && !args[currI].equals("-i")) {
             throw new InvalidLineArgumentException("Type of data to sort was not specified");
+        } else if (args[currI].equals("-s")) {
+            settings.setType(DataType.STRING);
         }
 
         File outputFile = new File(args[++currI]);
         if (!outputFile.isFile()) outputFile.createNewFile();
         settings.setOutputFile(outputFile);
 
-        while (++currI <= args.length) {
+        while (++currI < args.length) {
             File inputFile = new File(args[currI]);
             if (inputFile.isFile()) settings.addInputFile(inputFile);
         }
