@@ -66,16 +66,17 @@ public class FileMerger {
     }
 
     // Возвращает true, если current следует за previous в соответствии с указанным порядком
-    private boolean satisfiesOrder(String current, String previous) {
+    private boolean satisfiesOrder(String current, String previous, Order order) {
         int currNum, prevNum;
         if (settings.getType() == DataType.INTEGER) {
             currNum = Integer.parseInt(current);
             prevNum = Integer.parseInt(previous);
-            return (settings.getOrder() == Order.ASC) ? currNum >= prevNum : currNum <= prevNum;
+            return (order == Order.ASC) ? currNum >= prevNum : currNum <= prevNum;
         }
-
         return (settings.getOrder() == Order.ASC) ? current.compareTo(previous) >= 0 : current.compareTo(previous) <= 0;
     }
+
+
 
     private void processIfDataOrderBroken(String[] inputLines, int index, boolean[] stopReading,
                                           String[] previousValues) {
@@ -86,7 +87,7 @@ public class FileMerger {
             return;
         }
 
-        if (!satisfiesOrder(currValue, prevStrValue)) {
+        if (!satisfiesOrder(currValue, prevStrValue, settings.getOrder())) {
             inputLines[index] = null;
             stopReading[index] = true;
         } else {
@@ -112,18 +113,18 @@ public class FileMerger {
                 }
             }
 
-            processIfDataOrderBroken(inputLines, i, stopReading, previousValues);
+            if (line != null) processIfDataOrderBroken(inputLines, i, stopReading, previousValues);
         }
     }
 
     public String chooseLine(BufferedReader[] readers, boolean[] stopReading, String[] inputLines,
                              String[] previousValues) throws IOException {
         fillInputLines(inputLines, readers, stopReading,
-                previousValues);  // Заполнили массив для дальнейшего выбора миним. значения
-        // Выставить в null наименьший элемент
-        String minStrValue = null;
-        int minIntValue = Integer.MAX_VALUE;
-        int minElementIndex = -1;
+                previousValues);  // Заполнили массив значений для дальнейшего выбора ближайшего подходящего значения
+        // Выставить в null самый подходящий элемент
+        String bestStrValue = null;
+//        int bestIntValue = 0;
+        int bestElementIndex = -1;
 
         DataType type = settings.getType();
         // Выставить null в соотв. лементе массива
@@ -131,30 +132,35 @@ public class FileMerger {
             if (inputLines[i] == null) continue;
 
             // Выставляем минимальное значение, равное первому элементу, который ne null
-            if (minStrValue == null) {
-                minStrValue = inputLines[i];
-                minElementIndex = i;
-                if (type == DataType.INTEGER) minIntValue = Integer.parseInt(minStrValue);
+            if (bestStrValue == null) {
+                bestStrValue = inputLines[i];
+                bestElementIndex = i;
+//                if (type == DataType.INTEGER) bestIntValue = Integer.parseInt(bestStrValue);
             }
 
             // Сравнение чисел или строк соответственно
-            if (type == DataType.INTEGER) {
-                int a = Integer.parseInt(inputLines[i]);
-                if (a < minIntValue) {  // ТУТ СРАВНИВАНИЕ
-                    minElementIndex = i;
-                    minIntValue = a;
-                }
-            } else {
-                if (inputLines[i].compareTo(minStrValue) < 0) minStrValue = inputLines[i];  // ТУТ СРАВНИНВАНИЕ
-                minElementIndex = i;
+            if (satisfiesOrder(inputLines[i], bestStrValue, settings.getOrder().opposite())) {
+                bestStrValue = inputLines[i];
+                bestElementIndex = i;
             }
+
+//            if (type == DataType.INTEGER) {
+//                int a = Integer.parseInt(inputLines[i]);
+//                if (a < minIntValue) {  // ТУТ СРАВНИВАНИЕ
+//                    minElementIndex = i;
+//                    minIntValue = a;
+//                }
+//            } else {
+//                if (inputLines[i].compareTo(minStrValue) < 0) minStrValue = inputLines[i];  // ТУТ СРАВНИНВАНИЕ
+//                minElementIndex = i;
+//            }
         }
 
         // Задать значение текстового минимального значения, если тип сортируемых данных - числа
-        if (type == DataType.INTEGER && minStrValue != null) minStrValue = String.valueOf(minIntValue);
-        if (minElementIndex != -1) inputLines[minElementIndex] = null;
+//        if (type == DataType.INTEGER && minStrValue != null) minStrValue = String.valueOf(minIntValue);
+        if (bestElementIndex != -1) inputLines[bestElementIndex] = null;
 
-        return minStrValue;
+        return bestStrValue;
     }
 
 

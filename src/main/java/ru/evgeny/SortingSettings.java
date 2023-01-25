@@ -7,7 +7,14 @@ import java.util.List;
 
 enum Order {
     ASC,
-    DESC
+    DESC;
+
+    public Order opposite() {
+        return switch (this) {
+            case ASC -> DESC;
+            case DESC -> ASC;
+        };
+    }
 }
 
 
