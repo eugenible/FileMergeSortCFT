@@ -65,15 +65,37 @@ public class FileMerger {
         return settings.getType() != DataType.INTEGER || line.matches("^[+-]?[0-9]+$");
     }
 
+    // Возвращает true, если current следует за previous в соответствии с указанным порядком
+    private boolean satisfiesOrder(String current, String previous) {
+        int currNum, prevNum;
+        if (settings.getType() == DataType.INTEGER) {
+            currNum = Integer.parseInt(current);
+            prevNum = Integer.parseInt(previous);
+            return (settings.getOrder() == Order.ASC) ? currNum >= prevNum : currNum <= prevNum;
+        }
 
-    public void fillInputLines(BufferedReader[] readers, boolean[] readerAtEOF, String[] inputLines) throws IOException {
+        return (settings.getOrder() == Order.ASC) ? current.compareTo(previous) >= 0 : current.compareTo(previous) <= 0;
+    }
+
+    private void processIfDataOrderBroken(String[] inputLines, int index, boolean[] stopReading,
+                                          String[] previousValues) {
+        String prevStrValue = previousValues[index];
+        String currValue = inputLines[index];
+        if (!satisfiesOrder(currValue, prevStrValue)) {
+            inputLines[index] = null;
+            stopReading[index] = true;
+        }
+    }
+
+    public void fillInputLines(String[] inputLines, BufferedReader[] readers, boolean[] stopReading,
+                               String[] previousValues) throws IOException {
         for (int i = 0; i < inputLines.length; ++i) {
             if (inputLines[i] != null) continue;
             String line = null;
             boolean isValidLine = false;
-            while (!readerAtEOF[i] && !isValidLine) {
+            while (!stopReading[i] && !isValidLine) {
                 if ((line = readers[i].readLine()) == null) {
-                    readerAtEOF[i] = true;
+                    stopReading[i] = true;
                     continue;
                 }
 
@@ -82,11 +104,15 @@ public class FileMerger {
                     isValidLine = true;
                 }
             }
+
+            processIfDataOrderBroken(inputLines, i, stopReading, previousValues);
         }
     }
 
-    public String chooseLine(BufferedReader[] readers, boolean[] readerAtEOF, String[] inputLines) throws IOException {
-        fillInputLines(readers, readerAtEOF, inputLines);  // Заполнили массив для дальнейшего выбора миним. значения
+    public String chooseLine(BufferedReader[] readers, boolean[] stopReading, String[] inputLines,
+                             String[] previousValues) throws IOException {
+        fillInputLines(inputLines, readers, stopReading,
+                previousValues);  // Заполнили массив для дальнейшего выбора миним. значения
         // Выставить в null наименьший элемент
         String minStrValue = null;
         int minIntValue = Integer.MAX_VALUE;
@@ -107,12 +133,12 @@ public class FileMerger {
             // Сравнение чисел или строк соответственно
             if (type == DataType.INTEGER) {
                 int a = Integer.parseInt(inputLines[i]);
-                if (a < minIntValue) {
+                if (a < minIntValue) {  // ТУТ СРАВНИВАНИЕ
                     minElementIndex = i;
                     minIntValue = a;
                 }
             } else {
-                if (inputLines[i].compareTo(minStrValue) < 0) minStrValue = inputLines[i];
+                if (inputLines[i].compareTo(minStrValue) < 0) minStrValue = inputLines[i];  // ТУТ СРАВНИНВАНИЕ
                 minElementIndex = i;
             }
         }
@@ -130,13 +156,17 @@ public class FileMerger {
         if (readers == null) return false;
         // С пом. этого массива сможем проверять, достиг ли ридер EOF, не используя
         // сравнение "reader.readLine() != null" множество раз
-        boolean[] readerAtEOF = new boolean[readers.length];
+        boolean[] stopReading = new boolean[readers.length];
+        // Массив строк, ожидающих вставки в выходной файл, где
+        // каждая строка соответствует своему ридеру (по индексу)
         String[] inputLines = new String[readers.length];
+        // Массив последних получ. из ридеров значений для проверки правильности сортировки при чтении нового значения
+        String[] previousValues = new String[readers.length];
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(settings.getOutputFile(), false))) {
 
             while (true) {
-                String lineToWrite = chooseLine(readers, readerAtEOF, inputLines);
+                String lineToWrite = chooseLine(readers, stopReading, inputLines, previousValues);
                 if (lineToWrite == null) break;
                 writer.write(lineToWrite);
                 writer.newLine();
