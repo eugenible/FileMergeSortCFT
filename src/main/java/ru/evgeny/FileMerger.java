@@ -45,20 +45,6 @@ public class FileMerger {
         }
     }
 
-
-//    private void printAllReaders(BufferedReader[] readers) {
-//        for (BufferedReader reader : readers) {
-//            String line = null;
-//            try {
-//                while ((line = reader.readLine()) != null) {
-//                    System.out.println(line);
-//                }
-//            } catch (IOException e) {
-//                System.out.println(e.getMessage());
-//            }
-//        }
-//    }
-
     // Проверка, есть ли пробелы в строке или содержимое строки не соответствует типу данных.
     private boolean isValid(String line) {
         if (line.contains(" ")) return false;
@@ -75,7 +61,6 @@ public class FileMerger {
         }
         return (settings.getOrder() == Order.ASC) ? current.compareTo(previous) >= 0 : current.compareTo(previous) <= 0;
     }
-
 
 
     private void processIfDataOrderBroken(String[] inputLines, int index, boolean[] stopReading,
@@ -123,19 +108,15 @@ public class FileMerger {
                 previousValues);  // Заполнили массив значений для дальнейшего выбора ближайшего подходящего значения
         // Выставить в null самый подходящий элемент
         String bestStrValue = null;
-//        int bestIntValue = 0;
         int bestElementIndex = -1;
 
-        DataType type = settings.getType();
         // Выставить null в соотв. лементе массива
         for (int i = 0; i < inputLines.length; ++i) {
             if (inputLines[i] == null) continue;
-
             // Выставляем минимальное значение, равное первому элементу, который ne null
             if (bestStrValue == null) {
                 bestStrValue = inputLines[i];
                 bestElementIndex = i;
-//                if (type == DataType.INTEGER) bestIntValue = Integer.parseInt(bestStrValue);
             }
 
             // Сравнение чисел или строк соответственно
@@ -143,23 +124,9 @@ public class FileMerger {
                 bestStrValue = inputLines[i];
                 bestElementIndex = i;
             }
-
-//            if (type == DataType.INTEGER) {
-//                int a = Integer.parseInt(inputLines[i]);
-//                if (a < minIntValue) {  // ТУТ СРАВНИВАНИЕ
-//                    minElementIndex = i;
-//                    minIntValue = a;
-//                }
-//            } else {
-//                if (inputLines[i].compareTo(minStrValue) < 0) minStrValue = inputLines[i];  // ТУТ СРАВНИНВАНИЕ
-//                minElementIndex = i;
-//            }
         }
 
-        // Задать значение текстового минимального значения, если тип сортируемых данных - числа
-//        if (type == DataType.INTEGER && minStrValue != null) minStrValue = String.valueOf(minIntValue);
         if (bestElementIndex != -1) inputLines[bestElementIndex] = null;
-
         return bestStrValue;
     }
 
@@ -167,31 +134,28 @@ public class FileMerger {
     public boolean mergeFiles() {
         BufferedReader[] readers = getFileReaders(settings.getInputFiles());
         if (readers == null) return false;
-        // С пом. этого массива сможем проверять, достиг ли ридер EOF, не используя
-        // сравнение "reader.readLine() != null" множество раз
+        // С пом. этого массива обозачаем, нужно ли читать очередную строку из ридера (из-за достижения EOF или
+        // нарушения сортировки в соответствующем ридеру файле строку читать не надо)
         boolean[] stopReading = new boolean[readers.length];
-        // Массив строк, ожидающих вставки в выходной файл, где
-        // каждая строка соответствует своему ридеру (по индексу)
+        // Массив строк, из которых будет выбрано значение для записи в выходной файл. Каждый элемент
+        // получен из соответствующего индексу ридера. В ячейку, откуда была взята строка для записи в файл, в
+        // будущем будет положено следующее значение, прочитанное из соответствущего ридера.
         String[] inputLines = new String[readers.length];
-        // Массив последних получ. из ридеров значений для проверки правильности сортировки при чтении нового значения
+        // Массив последних получ. из ридеров значений для сравнения с только что прочитанным: используется для проверки
+        // правильности сортировки во входных файлах
         String[] previousValues = new String[readers.length];
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(settings.getOutputFile(), false))) {
-
             while (true) {
                 String lineToWrite = chooseLine(readers, stopReading, inputLines, previousValues);
                 if (lineToWrite == null) break;
                 writer.write(lineToWrite);
                 writer.newLine();
             }
-
         } catch (IOException e) {
             System.out.println("Couldn't write to file: " + e.getMessage());
             return false;
         }
-
-//        printAllReaders(readers);
-
 
         closeReaders(readers);
         return true;
