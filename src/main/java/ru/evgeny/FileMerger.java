@@ -63,24 +63,24 @@ public class FileMerger {
 
 
     private void checkReaderDataOrder(String[] inputLines, int index, boolean[] stopReading,
-                                      String[] previousValues) {
-        String prevValue = previousValues[index];
-        String currValue = inputLines[index];
-        if (prevValue == null) {
-            previousValues[index] = currValue;
+                                      String[] previousLines) {
+        String prevLine = previousLines[index];
+        String currLine = inputLines[index];
+        if (prevLine == null) {
+            previousLines[index] = currLine;
             return;
         }
 
-        if (!satisfiesOrder(currValue, prevValue, settings.getOrder())) {
+        if (!satisfiesOrder(currLine, prevLine, settings.getOrder())) {
             inputLines[index] = null;
             stopReading[index] = true;
         } else {
-            previousValues[index] = currValue;
+            previousLines[index] = currLine;
         }
     }
 
     private void fillInputLines(String[] inputLines, BufferedReader[] readers, boolean[] stopReading,
-                                String[] previousValues) throws IOException {
+                                String[] previousLines) throws IOException {
         for (int i = 0; i < readers.length; ++i) {
             if (inputLines[i] != null) continue;
             String line = null;
@@ -96,7 +96,7 @@ public class FileMerger {
                 }
             }
 
-            if (line != null) checkReaderDataOrder(inputLines, i, stopReading, previousValues);
+            if (line != null) checkReaderDataOrder(inputLines, i, stopReading, previousLines);
         }
     }
 
@@ -124,8 +124,8 @@ public class FileMerger {
     }
 
     private String chooseLine(BufferedReader[] readers, boolean[] stopReading, String[] inputLines,
-                              String[] previousValues) throws IOException {
-        fillInputLines(inputLines, readers, stopReading, previousValues);
+                              String[] previousLines) throws IOException {
+        fillInputLines(inputLines, readers, stopReading, previousLines);
         return findBestLine(inputLines);
     }
 
@@ -139,11 +139,11 @@ public class FileMerger {
 
         boolean[] stopReading = new boolean[readers.length];
         String[] inputLines = new String[readers.length];
-        String[] previousValues = new String[readers.length];
+        String[] previousLines = new String[readers.length];  // Для проверки правильности сортировки в файлах
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(settings.getOutputFile(), false))) {
             while (true) {
-                String lineToWrite = chooseLine(readers, stopReading, inputLines, previousValues);
+                String lineToWrite = chooseLine(readers, stopReading, inputLines, previousLines);
                 if (lineToWrite == null) break;
                 writer.write(lineToWrite);
                 writer.newLine();
