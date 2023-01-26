@@ -5,24 +5,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-enum Order {
-    ASC,
-    DESC;
-
-    public Order opposite() {
-        return switch (this) {
-            case ASC -> DESC;
-            case DESC -> ASC;
-        };
-    }
-}
-
-
-enum DataType {
-    STRING,
-    INTEGER
-}
-
 public class SortingSettings {
 
     private Order order;
