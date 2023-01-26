@@ -9,7 +9,8 @@ import java.io.IOException;
 
 public class SortingSettingsTest {
 
-    public static final String path = String.join(File.separator, "src", "test", "resources") + File.separator;
+    public static final String path = String.join(File.separator, "src", "test", "resources",
+            "parsingTestResources") + File.separator;
 
     @Test
     public void argumentsShouldBeParsedCorrectly1Case() throws IOException {
