@@ -71,23 +71,6 @@ public class FileMerger {
         }
     }
 
-    private void checkReaderDataOrder(String[] inputLines, int index, boolean[] stopReading,
-                                      String[] previousLines) {
-        String prevLine = previousLines[index];
-        String currLine = inputLines[index];
-        if (prevLine == null) {
-            previousLines[index] = currLine;
-            return;
-        }
-
-        if (!satisfiesOrder(currLine, prevLine, settings.getOrder())) {
-            inputLines[index] = null;
-            stopReading[index] = true;
-        } else {
-            previousLines[index] = currLine;
-        }
-    }
-
     private String findBestLine(String[] inputLines) {
         String bestValue = null;
         int bestElementIndex = -1;
@@ -107,6 +90,23 @@ public class FileMerger {
 
         if (bestValue != null) inputLines[bestElementIndex] = null;
         return bestValue;
+    }
+
+    private void checkReaderDataOrder(String[] inputLines, int index, boolean[] stopReading,
+                                      String[] previousLines) {
+        String prevLine = previousLines[index];
+        String currLine = inputLines[index];
+        if (prevLine == null) {
+            previousLines[index] = currLine;
+            return;
+        }
+
+        if (!satisfiesOrder(currLine, prevLine, settings.getOrder())) {
+            inputLines[index] = null;
+            stopReading[index] = true;
+        } else {
+            previousLines[index] = currLine;
+        }
     }
 
     // Возвращает true, если current следует за previous в соотв. с порядком order, иначе false.
