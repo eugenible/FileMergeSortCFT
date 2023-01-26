@@ -67,7 +67,7 @@ public class FileMerger {
                 }
             }
 
-            if (line != null) checkReaderDataOrder(inputLines, i, stopReading, previousLines);
+            if (line != null) processReaderDataOrder(inputLines, i, stopReading, previousLines);
         }
     }
 
@@ -92,20 +92,16 @@ public class FileMerger {
         return bestValue;
     }
 
-    private void checkReaderDataOrder(String[] inputLines, int index, boolean[] stopReading,
-                                      String[] previousLines) {
+    private void processReaderDataOrder(String[] inputLines, int index, boolean[] stopReading,
+                                        String[] previousLines) {
         String prevLine = previousLines[index];
         String currLine = inputLines[index];
-        if (prevLine == null) {
-            previousLines[index] = currLine;
-            return;
-        }
 
-        if (!satisfiesOrder(currLine, prevLine, settings.getOrder())) {
+        if (prevLine == null || satisfiesOrder(currLine, prevLine, settings.getOrder())) {
+            previousLines[index] = currLine;
+        } else {
             inputLines[index] = null;
             stopReading[index] = true;
-        } else {
-            previousLines[index] = currLine;
         }
     }
 
