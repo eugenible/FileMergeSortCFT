@@ -18,7 +18,7 @@ public class FileMerger {
         this.settings = settings;
     }
 
-    public BufferedReader[] getFileReaders(List<File> inputFiles) {
+    private BufferedReader[] getFileReaders(List<File> inputFiles) {
         int numOfFiles = inputFiles.size();
         BufferedReader[] readers = new BufferedReader[numOfFiles];
         try {
@@ -45,13 +45,11 @@ public class FileMerger {
         }
     }
 
-    // Проверка, есть ли пробелы в строке или содержимое строки не соответствует типу данных.
     private boolean isValid(String line) {
         if (line.contains(" ")) return false;
         return settings.getType() != DataType.INTEGER || line.matches("^[+-]?[0-9]+$");
     }
 
-    // Возвращает true, если current следует за previous в соответствии с указанным порядком
     private boolean satisfiesOrder(String current, String previous, Order order) {
         int currNum, prevNum;
         if (settings.getType() == DataType.INTEGER) {
@@ -65,14 +63,14 @@ public class FileMerger {
 
     private void processIfDataOrderBroken(String[] inputLines, int index, boolean[] stopReading,
                                           String[] previousValues) {
-        String prevStrValue = previousValues[index];
+        String prevValue = previousValues[index];
         String currValue = inputLines[index];
-        if (prevStrValue == null) {
+        if (prevValue == null) {
             previousValues[index] = currValue;
             return;
         }
 
-        if (!satisfiesOrder(currValue, prevStrValue, settings.getOrder())) {
+        if (!satisfiesOrder(currValue, prevValue, settings.getOrder())) {
             inputLines[index] = null;
             stopReading[index] = true;
         } else {
@@ -80,8 +78,8 @@ public class FileMerger {
         }
     }
 
-    public void fillInputLines(String[] inputLines, BufferedReader[] readers, boolean[] stopReading,
-                               String[] previousValues) throws IOException {
+    private void fillInputLines(String[] inputLines, BufferedReader[] readers, boolean[] stopReading,
+                                String[] previousValues) throws IOException {
         for (int i = 0; i < inputLines.length; ++i) {
             if (inputLines[i] != null) continue;
             String line = null;
@@ -91,7 +89,6 @@ public class FileMerger {
                     stopReading[i] = true;
                     continue;
                 }
-
                 if (isValid(line)) {
                     inputLines[i] = line;
                     isValidLine = true;
@@ -102,47 +99,45 @@ public class FileMerger {
         }
     }
 
-    public String chooseLine(BufferedReader[] readers, boolean[] stopReading, String[] inputLines,
-                             String[] previousValues) throws IOException {
-        fillInputLines(inputLines, readers, stopReading,
-                previousValues);  // Заполнили массив значений для дальнейшего выбора ближайшего подходящего значения
-        // Выставить в null самый подходящий элемент
-        String bestStrValue = null;
+    private String findBestLine(String[] inputLines) {
+        String bestValue = null;
         int bestElementIndex = -1;
 
-        // Выставить null в соотв. лементе массива
         for (int i = 0; i < inputLines.length; ++i) {
             if (inputLines[i] == null) continue;
-            // Выставляем минимальное значение, равное первому элементу, который ne null
-            if (bestStrValue == null) {
-                bestStrValue = inputLines[i];
+
+            if (bestValue == null) {
+                bestValue = inputLines[i];
                 bestElementIndex = i;
             }
 
-            // Сравнение чисел или строк соответственно
-            if (satisfiesOrder(inputLines[i], bestStrValue, settings.getOrder().opposite())) {
-                bestStrValue = inputLines[i];
+            if (satisfiesOrder(inputLines[i], bestValue, settings.getOrder().opposite())) {
+                bestValue = inputLines[i];
                 bestElementIndex = i;
             }
         }
 
-        if (bestElementIndex != -1) inputLines[bestElementIndex] = null;
-        return bestStrValue;
+        if (bestValue != null) inputLines[bestElementIndex] = null;
+
+        return bestValue;
     }
 
+    private String chooseLine(BufferedReader[] readers, boolean[] stopReading, String[] inputLines,
+                              String[] previousValues) throws IOException {
+        fillInputLines(inputLines, readers, stopReading, previousValues);
+        return findBestLine(inputLines);
+    }
 
-    public boolean mergeFiles() {
+    // Алгоритм работы: создается n Reader-ов, где n - кол-во входных файлов, из каждого reader-а считывается одно
+    // значение и помещается в массив "отбора", из которого затем выбирается подходящее по условиям сортировки и
+    // записывается в выходной файл. В массив "отбора" далее помещается новое значение из соответствующего ридера.
+    // Действия повторяются до тех пор, пока соблюдается порядок сортировки и есть данные для чтения.
+    public void mergeFiles() {
         BufferedReader[] readers = getFileReaders(settings.getInputFiles());
-        if (readers == null) return false;
-        // С пом. этого массива обозачаем, нужно ли читать очередную строку из ридера (из-за достижения EOF или
-        // нарушения сортировки в соответствующем ридеру файле строку читать не надо)
+        if (readers == null) return;
+
         boolean[] stopReading = new boolean[readers.length];
-        // Массив строк, из которых будет выбрано значение для записи в выходной файл. Каждый элемент
-        // получен из соответствующего индексу ридера. В ячейку, откуда была взята строка для записи в файл, в
-        // будущем будет положено следующее значение, прочитанное из соответствущего ридера.
         String[] inputLines = new String[readers.length];
-        // Массив последних получ. из ридеров значений для сравнения с только что прочитанным: используется для проверки
-        // правильности сортировки во входных файлах
         String[] previousValues = new String[readers.length];
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(settings.getOutputFile(), false))) {
@@ -154,11 +149,9 @@ public class FileMerger {
             }
         } catch (IOException e) {
             System.out.println("Couldn't write to file: " + e.getMessage());
-            return false;
         }
 
         closeReaders(readers);
-        return true;
     }
 
 }

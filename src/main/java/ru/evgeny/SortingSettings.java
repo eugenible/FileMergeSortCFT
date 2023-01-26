@@ -36,9 +36,9 @@ public class SortingSettings {
         inputFiles = new ArrayList<>();
     }
 
-    public static SortingSettings getInstance(String[] args) throws InvalidLineArgumentException, IOException {
+    public static SortingSettings getInstance(String[] args) throws IOException {
         int minArguments = 3;
-        if (args.length < minArguments) throw new InvalidLineArgumentException("Too few parameters");
+        if (args.length < minArguments) throw new IOException("Too few parameters");
         int currI = 0;
         SortingSettings settings = new SortingSettings();
 
@@ -48,7 +48,7 @@ public class SortingSettings {
         }
 
         if (!args[currI].equals("-s") && !args[currI].equals("-i")) {
-            throw new InvalidLineArgumentException("Type of data to sort was not specified");
+            throw new IOException("Type of data to sort was not specified");
         } else if (args[currI].equals("-s")) {
             settings.setType(DataType.STRING);
         }
@@ -62,9 +62,8 @@ public class SortingSettings {
             if (inputFile.isFile()) settings.addInputFile(inputFile);
         }
 
-        // Проверка, что есть хотя бы 1 входной файл
         if (settings.getInputFiles().size() == 0)
-            throw new InvalidLineArgumentException("There must be at least one input file to produce output file");
+            throw new IOException("There must be at least one input file to produce output file");
 
         return settings;
     }
