@@ -50,7 +50,7 @@ public class FileMerger {
         return settings.getType() != DataType.INTEGER || line.matches("^[+-]?[0-9]+$");
     }
 
-    // Возвращает true, если current следует за previous в соотв. с порядком order
+    // Возвращает true, если current следует за previous в соотв. с порядком order, иначе false.
     private boolean satisfiesOrder(String current, String previous, Order order) {
         int currNum, prevNum;
         if (settings.getType() == DataType.INTEGER) {
@@ -60,7 +60,6 @@ public class FileMerger {
         }
         return (settings.getOrder() == Order.ASC) ? current.compareTo(previous) >= 0 : current.compareTo(previous) <= 0;
     }
-
 
     private void checkReaderDataOrder(String[] inputLines, int index, boolean[] stopReading,
                                       String[] previousLines) {
@@ -123,7 +122,7 @@ public class FileMerger {
         return bestValue;
     }
 
-    private String chooseLine(BufferedReader[] readers, boolean[] stopReading, String[] inputLines,
+    private String getLineToWrite(BufferedReader[] readers, boolean[] stopReading, String[] inputLines,
                               String[] previousLines) throws IOException {
         fillInputLines(inputLines, readers, stopReading, previousLines);
         return findBestLine(inputLines);
@@ -143,7 +142,7 @@ public class FileMerger {
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(settings.getOutputFile(), false))) {
             while (true) {
-                String lineToWrite = chooseLine(readers, stopReading, inputLines, previousLines);
+                String lineToWrite = getLineToWrite(readers, stopReading, inputLines, previousLines);
                 if (lineToWrite == null) break;
                 writer.write(lineToWrite);
                 writer.newLine();
