@@ -84,15 +84,15 @@ public class FileMerger {
         for (int i = 0; i < readers.length; ++i) {
             if (inputLines[i] != null) continue;
             String line = null;
-            boolean isValidLine = false;
-            while (!stopReading[i] && !isValidLine) {
+            boolean isInvalidLine = true;
+            while (!stopReading[i] && isInvalidLine) {
                 if ((line = readers[i].readLine()) == null) {
                     stopReading[i] = true;
                     continue;
                 }
                 if (isValid(line)) {
                     inputLines[i] = line;
-                    isValidLine = true;
+                    isInvalidLine = false;
                 }
             }
 
