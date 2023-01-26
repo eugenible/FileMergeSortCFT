@@ -50,6 +50,7 @@ public class FileMerger {
         return settings.getType() != DataType.INTEGER || line.matches("^[+-]?[0-9]+$");
     }
 
+    // Возвращает true, если current следует за previous в соотв. с порядком order
     private boolean satisfiesOrder(String current, String previous, Order order) {
         int currNum, prevNum;
         if (settings.getType() == DataType.INTEGER) {
@@ -61,8 +62,8 @@ public class FileMerger {
     }
 
 
-    private void processIfDataOrderBroken(String[] inputLines, int index, boolean[] stopReading,
-                                          String[] previousValues) {
+    private void checkReaderDataOrder(String[] inputLines, int index, boolean[] stopReading,
+                                      String[] previousValues) {
         String prevValue = previousValues[index];
         String currValue = inputLines[index];
         if (prevValue == null) {
@@ -95,7 +96,7 @@ public class FileMerger {
                 }
             }
 
-            if (line != null) processIfDataOrderBroken(inputLines, i, stopReading, previousValues);
+            if (line != null) checkReaderDataOrder(inputLines, i, stopReading, previousValues);
         }
     }
 
