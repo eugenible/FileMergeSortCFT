@@ -80,7 +80,7 @@ public class FileMerger {
 
     private void fillInputLines(String[] inputLines, BufferedReader[] readers, boolean[] stopReading,
                                 String[] previousValues) throws IOException {
-        for (int i = 0; i < inputLines.length; ++i) {
+        for (int i = 0; i < readers.length; ++i) {
             if (inputLines[i] != null) continue;
             String line = null;
             boolean isValidLine = false;

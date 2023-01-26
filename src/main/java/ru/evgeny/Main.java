@@ -16,15 +16,11 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        System.out.println(System.getProperty("user.dir"));
         try {
             SortingSettings settings = SortingSettings.getInstance(args);
-
             printInfo(settings);
-
             FileMerger merger = new FileMerger(settings);
             merger.mergeFiles();
-
         } catch (IOException e) {
             System.out.println(e.getMessage());
         }
