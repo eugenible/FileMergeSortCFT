@@ -22,7 +22,7 @@ JUnit Maven dependency:
 ### Запуск (1 способ):
 * Открыть папку с проектом (В Intellij IDEA: открыть pom.xml как проект, подгрузить все необходимые зависимости через Reload Project в Maven)
 * Выполнить цель ```mvn install```
-* Исполняемый файл **sort-t-1.0.jar** будет находиться в папке **target**
+* Исполняемый файл **sort-it-1.0.jar** будет находиться в папке **target**
 * Запустить программу (пример для случая, когда запускаем из корневой директории проекта):
 
 ```java -jar target/sort-it-1.0.jar output.txt input1.txt input2.txt input3.txt```
