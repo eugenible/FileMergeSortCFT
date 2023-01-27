@@ -5,8 +5,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>ru.evgeny</groupId>
-    <artifactId>FileMergeSort</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <artifactId>sort-it</artifactId>
+    <version>1.0</version>
 
     <properties>
         <maven.compiler.source>18</maven.compiler.source>
