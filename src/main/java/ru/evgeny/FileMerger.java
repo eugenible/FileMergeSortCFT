@@ -113,7 +113,7 @@ public class FileMerger {
             prevNum = Integer.parseInt(previous);
             return (order == Order.ASC) ? currNum >= prevNum : currNum <= prevNum;
         }
-        return (settings.getOrder() == Order.ASC) ? current.compareTo(previous) >= 0 : current.compareTo(previous) <= 0;
+        return (order == Order.ASC) ? current.compareTo(previous) >= 0 : current.compareTo(previous) <= 0;
     }
 
     private boolean isValid(String line) {
