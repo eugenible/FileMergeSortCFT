@@ -92,6 +92,7 @@ public class FileMerger {
         return bestValue;
     }
 
+    // Проверяет правильность порядка данных из файла, регистрируя нарушения в массиве stopReading
     private void processReaderDataOrder(String[] inputLines, int index, boolean[] stopReading,
                                         String[] previousLines) {
         String prevLine = previousLines[index];
