@@ -57,6 +57,7 @@ public class SortingSettings {
     }
 
     public static void printInfo(SortingSettings settings) {
+        System.out.println();
         System.out.println("Order type: " + settings.getOrder());
         System.out.println("Data type: " + settings.getType());
         System.out.println("Output file: " + settings.getOutputFile().getName());
