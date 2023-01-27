@@ -1,4 +1,4 @@
-package ru.evgeny;
+package ru.evgeny.merge;
 
 public enum DataType {
     STRING,

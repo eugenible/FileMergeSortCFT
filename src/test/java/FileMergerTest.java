@@ -1,8 +1,8 @@
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import ru.evgeny.FileMerger;
-import ru.evgeny.SortingSettings;
+import ru.evgeny.merge.FileMerger;
+import ru.evgeny.merge.SortingSettings;
 
 import java.io.File;
 import java.io.IOException;

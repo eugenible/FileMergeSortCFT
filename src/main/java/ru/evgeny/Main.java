@@ -1,5 +1,8 @@
 package ru.evgeny;
 
+import ru.evgeny.merge.FileMerger;
+import ru.evgeny.merge.SortingSettings;
+
 import java.io.File;
 import java.io.IOException;
 

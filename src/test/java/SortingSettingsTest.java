@@ -1,8 +1,8 @@
 import org.junit.Assert;
 import org.junit.Test;
-import ru.evgeny.DataType;
-import ru.evgeny.Order;
-import ru.evgeny.SortingSettings;
+import ru.evgeny.merge.DataType;
+import ru.evgeny.merge.Order;
+import ru.evgeny.merge.SortingSettings;
 
 import java.io.File;
 import java.io.IOException;
