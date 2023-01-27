@@ -107,5 +107,25 @@ public class FileMergerTest {
         Assert.assertEquals(strFromCheckFile, strFromMergedFiles);
     }
 
+    @Test
+    public void descCorrectSortCorrectStringData() throws IOException {
+        String tPath = path + "case5" + File.separator;
+        String outputFileForTest = tPath + "out.txt";
+        String checkFile = tPath + "check.txt";
+
+        SortingSettings parsed = SortingSettings.getInstance(
+                new String[]{"-a",
+                        "-s",
+                        outputFileForTest,
+                        tPath + "1.txt",
+                        tPath + "2.txt",
+                        tPath + "3.txt"});
+        FileMerger merger = new FileMerger(parsed);
+        merger.mergeFiles();
+        String strFromMergedFiles = Files.readString(Paths.get(outputFileForTest), StandardCharsets.UTF_8);
+        String strFromCheckFile = Files.readString(Paths.get(checkFile), StandardCharsets.UTF_8);
+        Assert.assertEquals(strFromCheckFile, strFromMergedFiles);
+    }
+
 
 }
