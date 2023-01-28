@@ -19,6 +19,11 @@ JUnit Maven dependency:
             <scope>test</scope>
         </dependency>
 
+* В Maven добавлен plugin для соборки исполняемого jar-файла с зависимостями (смотри pom.xml):
+
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+
 ### Запуск (1 способ):
 
 * Открыть папку с проектом (В Intellij IDEA: открыть pom.xml как проект, подгрузить все необходимые зависимости через
