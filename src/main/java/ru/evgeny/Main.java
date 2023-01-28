@@ -10,9 +10,9 @@ public class Main {
     public static void main(String[] args) {
         try {
             SortingSettings settings = SortingSettings.getInstance(args);
-            SortingSettings.printInfo(settings);
             FileMerger merger = new FileMerger(settings);
             merger.mergeFiles();
+            SortingSettings.printInfo(settings);
         } catch (IOException e) {
             System.out.println(e.getMessage());
         }

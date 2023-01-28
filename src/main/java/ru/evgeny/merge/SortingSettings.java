@@ -13,6 +13,7 @@ public class SortingSettings {
     private boolean outputFileFound;
     private List<File> inputFiles;
     private List<String> missingInputFiles;
+    private List<String> badOrderFilenames;
 
     public SortingSettings() {
         order = Order.ASC;
@@ -21,6 +22,7 @@ public class SortingSettings {
         outputFileFound = false;
         inputFiles = new ArrayList<>();
         missingInputFiles = new ArrayList<>();
+        badOrderFilenames = new ArrayList<>();
     }
 
     public static SortingSettings getInstance(String[] args) throws IOException {
@@ -73,6 +75,12 @@ public class SortingSettings {
 
         for (String name : settings.getMissingInputFiles()) {
             System.out.println("Входной файл \"" + name + "\" не был найден");
+        }
+
+        if (!settings.getBadOrderFilenames().isEmpty()) {
+            for (String name : settings.getBadOrderFilenames()) {
+                System.out.println("Нарушен порядок сортировки данных в файле: " + name);
+            }
         }
     }
 
@@ -127,6 +135,12 @@ public class SortingSettings {
     public void setMissingInputFiles(List<String> missingInputFiles) {
         this.missingInputFiles = missingInputFiles;
     }
+
+    public List<String> getBadOrderFilenames() {
+        return badOrderFilenames;
+    }
+
+    public void setBadOrderFilenames(List<String> badOrderFilenames) {
+        this.badOrderFilenames = badOrderFilenames;
+    }
 }
-
-

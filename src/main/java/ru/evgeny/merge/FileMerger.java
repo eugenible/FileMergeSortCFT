@@ -67,7 +67,9 @@ public class FileMerger {
                 }
             }
 
-            if (line != null) processReaderDataOrder(inputLines, i, stopReading, previousLines);
+            if (line != null && !processFileDataOrder(inputLines, i, stopReading, previousLines)) {
+                settings.getBadOrderFilenames().add(settings.getInputFiles().get(i).getName());
+            }
         }
     }
 
@@ -93,17 +95,19 @@ public class FileMerger {
     }
 
     // Проверяет правильность порядка данных из файла, регистрируя нарушения в массиве stopReading
-    private void processReaderDataOrder(String[] inputLines, int index, boolean[] stopReading,
-                                        String[] previousLines) {
+    private boolean processFileDataOrder(String[] inputLines, int index, boolean[] stopReading,
+                                         String[] previousLines) {
         String prevLine = previousLines[index];
         String currLine = inputLines[index];
 
         if (prevLine == null || satisfiesOrder(currLine, prevLine, settings.getOrder())) {
             previousLines[index] = currLine;
-        } else {
-            inputLines[index] = null;
-            stopReading[index] = true;
+            return true;
         }
+
+        inputLines[index] = null;
+        stopReading[index] = true;
+        return false;
     }
 
     // Возвращает true, если current следует за previous в соотв. с порядком order, иначе false.
