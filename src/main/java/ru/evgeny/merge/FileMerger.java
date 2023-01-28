@@ -10,14 +10,6 @@ public class FileMerger {
         this.settings = settings;
     }
 
-    public SortingSettings getSettings() {
-        return settings;
-    }
-
-    public void setSettings(SortingSettings settings) {
-        this.settings = settings;
-    }
-
     // Алгоритм работы: создается n Reader-ов, где n - кол-во входных файлов, из каждого reader-а считывается одно
     // значение и помещается в массив "отбора", из которого затем выбирается подходящее по условиям сортировки и
     // записывается в выходной файл. В массив "отбора" далее помещается новое значение из соответствующего ридера.
@@ -151,5 +143,13 @@ public class FileMerger {
                 }
             }
         }
+    }
+
+    public SortingSettings getSettings() {
+        return settings;
+    }
+
+    public void setSettings(SortingSettings settings) {
+        this.settings = settings;
     }
 }

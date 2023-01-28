@@ -77,10 +77,8 @@ public class SortingSettings {
             System.out.println("Входной файл \"" + name + "\" не был найден");
         }
 
-        if (!settings.getBadOrderFilenames().isEmpty()) {
-            for (String name : settings.getBadOrderFilenames()) {
-                System.out.println("Нарушен порядок сортировки данных в файле: " + name);
-            }
+        for (String name : settings.getBadOrderFilenames()) {
+            System.out.println("Нарушен порядок сортировки данных в файле: " + name);
         }
     }
 
